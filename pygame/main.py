@@ -1,59 +1,60 @@
-# Importing pygame module
 import pygame
-from pygame.locals import *
-
-# initiate pygame and give permission
-# to use pygame's functionality.
 pygame.init()
 
-# create the display surface object
-# of specific dimension.
-window = pygame.display.set_mode((600, 600))
+win = pygame.display.set_mode((500, 500))
+pygame.display.set_caption("Moving rectangle with jump")
 
-# Fill the scree with white color
+x = 200
+y = 400   # začíná na zemi
 
-# creating list in which we will store
-# the position of the circle
-pygame.draw.rect(window, (0,   0, 255),
-                 [100, 100, 400, 100], 0)
+width = 20
+height = 20
 
-rect_positions = []
-# radius of the circle
+vel = 5
+jump_vel = 15
+gravity = 1
 
+is_jumping = False
+y_velocity = 0
 
-# Color of the circle
-color = (0, 0, 255)
-
-# Creating a variable which we will use
-# to run the while loop
+clock = pygame.time.Clock()
 run = True
 
-# Creating a while loop
 while run:
-    window.fill((255, 255, 255))
+    clock.tick(60)
 
-    # Iterating over all the events received from
-    # pygame.event.get()
     for event in pygame.event.get():
-
-        # If the type of the event is quit
-        # then setting the run variable to false
-        if event.type == QUIT:
+        if event.type == pygame.QUIT:
             run = False
 
-        # if the type of the event is MOUSEBUTTONDOWN
-        # then storing the current position
-        elif event.type == MOUSEBUTTONDOWN:
-            position = event.pos
-            rect_positions.append(position)
-            
-    # Using for loop to iterate
-    # over the circle_positions
-    # list
-    for position in rect_positions:
+    keys = pygame.key.get_pressed()
 
-        # Drawing the circle
-        pygame.draw.rect(window, color, position,)
+    # Pohyb do stran
+    if keys[pygame.K_LEFT] and x > 0:
+        x -= vel
+    if keys[pygame.K_RIGHT] and x < 500 - width:
+        x += vel
 
-    # Draws the surface object to the screen.
+    # Skok (mezerník)
+    if not is_jumping:
+        if keys[pygame.K_SPACE]:
+            is_jumping = True
+            y_velocity = -jump_vel
+
+    # Gravitace
+    if is_jumping:
+        y += y_velocity
+        y_velocity += gravity
+
+        # Kontrola země
+        if y >= 500 - height:
+            y = 500 - height
+            is_jumping = False
+
+    win.fill((0, 0, 0))
+    pygame.draw.rect(win, (255, 0, 0), (x, y, width, height))
     pygame.display.update()
+
+pygame.quit()
+
+    
